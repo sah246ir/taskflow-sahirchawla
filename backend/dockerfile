@@ -1,0 +1,26 @@
+from node:22-alpine as builder
+
+WORKDIR /app
+
+COPY package*.json .
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+FROM node:22-alpine as runner
+
+WORKDIR /app
+
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+
+RUN npm install --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
