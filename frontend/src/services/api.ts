@@ -1,8 +1,11 @@
 import axios from "axios"
 import { ENV } from "../config/env"
 
+/** Path prefix when `VITE_API_URL` is the server origin (e.g. `http://localhost:8000`). */
+const API_V1 = "/api/v1/"
+
 export const api = axios.create({
-  baseURL: ENV.API_URL
+  baseURL: ENV.API_URL + API_V1,
 })
 
 // attach token to every request automatically
