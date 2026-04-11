@@ -1,5 +1,6 @@
 import { Response } from "express"
 import { ZodError } from "zod"
+import { errorResponse } from "./response"
 export type ErrorCode =
   | 'NOT_FOUND'
   | 'FORBIDDEN'
@@ -42,30 +43,30 @@ const zodToFieldErrors = (err: ZodError): Record<string, string> => {
 
 export const handleError = (error: unknown, res: Response) => {
   if (error instanceof ZodError) {
-    return res.status(400).json({
-      error: "validation failed",
-      fields: zodToFieldErrors(error),
-    })
+    return res
+      .status(400)
+      .json(errorResponse("validation failed", { fields: zodToFieldErrors(error) }))
   }
   if (error instanceof AppError) {
     const status = statusFromCode[error.code]
     if (error.code === "VALIDATION_ERROR" && error.meta?.fields) {
-      return res.status(status).json({
-        error: "validation failed",
-        fields: error.meta.fields as Record<string, string>,
-      })
+      return res.status(status).json(
+        errorResponse("validation failed", {
+          fields: error.meta.fields as Record<string, string>,
+        })
+      )
     }
     if (error.code === "NOT_FOUND") {
-      return res.status(status).json({ error: "not found" })
+      return res.status(status).json(errorResponse("not found"))
     }
     if (error.code === "UNAUTHORIZED") {
-      return res.status(status).json({ error: "unauthorized" })
+      return res.status(status).json(errorResponse("unauthorized"))
     }
     if (error.code === "FORBIDDEN") {
-      return res.status(status).json({ error: "forbidden" })
+      return res.status(status).json(errorResponse("forbidden"))
     }
-    return res.status(status).json({ error: error.message })
+    return res.status(status).json(errorResponse(error.message))
   }
   console.error(error)
-  return res.status(500).json({ error: "internal server error" })
+  return res.status(500).json(errorResponse("internal server error"))
 }
