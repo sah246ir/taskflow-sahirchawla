@@ -33,6 +33,7 @@ model User {
 
   owned_projects Project[] @relation("ProjectOwner")
   assigned_tasks Task[]    @relation("TaskAssignee")
+  created_tasks  Task[]   @relation("TaskCreator")
 }
 
 model Project {
@@ -56,6 +57,8 @@ model Task {
   project      Project      @relation(fields: [project_id], references: [id])
   assignee_id  String?      @db.Uuid
   assignee     User?        @relation("TaskAssignee", fields: [assignee_id], references: [id])
+  creator_id   String?      @db.Uuid
+  creator      User?        @relation("TaskCreator", fields: [creator_id], references: [id])
   due_date     DateTime?    @db.Date
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
