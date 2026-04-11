@@ -1,6 +1,7 @@
 import express from "express";
 import { corsMiddleware } from "./middlewares/cors.middleware";
 import { apiRouter } from "./routes";
+import bodyParser from "body-parser";
 
 declare global{
   namespace Express{
@@ -14,7 +15,12 @@ declare global{
 }
 
 const app = express();
+app.use((req, res, next) => {
+  if (!req.body) req.body = {}
+  next()
+})
 app.use(corsMiddleware);
+app.use(bodyParser.json());
 
 app.use("/api",apiRouter)
 
