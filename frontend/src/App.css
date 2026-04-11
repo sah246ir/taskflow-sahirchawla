@@ -40,7 +40,7 @@
 :root {
   --radius: 0.5rem;
 
-  --background: 0 0% 100%;
+  --background: 198 60% 95%;
   --foreground: 222 47% 11%;
 
   --card: 0 0% 100%;
@@ -80,7 +80,7 @@
 }
 
 .dark {
-  --background: 222 47% 11%;
+  --background: 197 88% 92%;
   --foreground: 210 40% 98%;
 
   --card: 222 47% 13%;

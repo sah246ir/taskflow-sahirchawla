@@ -25,7 +25,8 @@ export const registerController = async (req: Request, res: Response) => {
 }
 
 export const meController = async (req: Request, res: Response) => {
-  try {
+  try { 
+    console.log(req.user?.userId)
     const data = await getProfile(req.user?.userId as string)
     res.status(200).json(successResponse(data))
   } catch (err) {

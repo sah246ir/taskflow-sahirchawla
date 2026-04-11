@@ -19,7 +19,7 @@ export async function register(body: RegisterSchemaType): Promise<ApiResponse<Au
   return data
 }
 
-type User = {
+export type User = {
   id: string
   name: string
   email: string
