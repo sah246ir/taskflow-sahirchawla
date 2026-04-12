@@ -6,6 +6,7 @@ import {
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
 import type { User } from "./auth.service"
+import type { TaskListData } from "./tasks.service"
 
 export type ProjectListData = {
   id: string
@@ -67,5 +68,16 @@ export async function deleteProject(id: string) {
 
 export async function getProjectUsers(projectId: string) {
   const { data } = await api.get<ApiResponse<User[]>>(`/projects/${projectId}/users`)
+  return data
+}
+
+export type ProjectStats = {
+  todo: number
+  in_progress: number
+  done: number
+  recent5Tasks: TaskListData
+}
+export async function getProjectStats(projectId: string) {
+  const { data } = await api.get<ApiResponse<ProjectStats>>(`/projects/${projectId}/stats`)
   return data
 }

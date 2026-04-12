@@ -20,6 +20,10 @@ export type TaskListData = {
   created_at: string
   updated_at: string
   assignee?: User | null
+  project?: {
+    id: string
+    name: string
+  } | null
 }[]
 export type TaskListPayload = {
   tasks: TaskListData
