@@ -5,8 +5,8 @@ export const projectIdParamSchema = z.object({
 })
 
 export const listProjectsQuerySchema = z.object({
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().max(100).optional(),
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
 })
 
 export const createProjectSchema = z.object({

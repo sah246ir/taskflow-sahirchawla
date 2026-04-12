@@ -5,8 +5,8 @@ import { TaskPriority, TaskStatus } from "../generated/prisma/client"
 export const listTasksQuerySchema = z.object({
   status: z.enum(TaskStatus).optional(),
   assignee: z.string().optional(),
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().max(100).optional(),
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
   priority: z.enum(TaskPriority).optional(),
 })
 
