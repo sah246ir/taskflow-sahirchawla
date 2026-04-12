@@ -13,7 +13,6 @@ import {
   type PaginationState,
 } from "@tanstack/react-table"
 
-import { Input } from "@/components/shadcn/input"
 import {
   Table,
   TableBody,
@@ -23,6 +22,8 @@ import {
   TableRow,
 } from "@/components/shadcn/table"
 import { Button } from "@/components/shadcn/button"
+import TableFallback from "./components/TableFallback"
+import TableLoader from "./components/TableLoader"
 
 type DataTableProps<TData> = {
   columns: ColumnDef<TData>[]
@@ -31,17 +32,24 @@ type DataTableProps<TData> = {
   manualPagination?: boolean
   pageCount?: number
   pagination?: PaginationState
-  onPaginationChange?: (pagination: PaginationState) => void
+  onPaginationChange?: (pagination: PaginationState) => void,
+  fallback?:{
+    title: string
+    description?: string
+    cta?: React.ReactNode
+  }
+  isLoading?: boolean
 }
 
 export function DataTable<TData>({
   columns,
   data,
-  filterColumnKey,
+  fallback,
   manualPagination = false,
   pageCount,
   pagination,
   onPaginationChange,
+  isLoading = false,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -89,7 +97,7 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows.length && !isLoading ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -105,7 +113,13 @@ export function DataTable<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {
+                    isLoading ? (
+                      <TableLoader />
+                    ) : (
+                      <TableFallback title={fallback?.title} description={fallback?.description} cta={fallback?.cta} />
+                    )
+                  }
                 </TableCell>
               </TableRow>
             )}
