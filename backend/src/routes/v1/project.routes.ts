@@ -3,6 +3,7 @@ import {
   createProjectController,
   deleteProjectController,
   getProjectByIdController,
+  getProjectStatsController,
   getProjectUsersController,
   listProjectsController,
   updateProjectController,
@@ -35,4 +36,9 @@ projectRouter.post(
   "/:projectId/tasks",
   projectAccessMiddleware,
   createTaskController
+)
+projectRouter.get(
+  "/:projectId/stats",
+  projectAccessMiddleware,
+  getProjectStatsController
 )

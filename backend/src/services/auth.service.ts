@@ -101,3 +101,63 @@ export const getUsers = async (q:string) => {
     })
     return users
 }
+
+export const getUserStats = async (userId: string) => {
+  const [todo, in_progress, done] = await Promise.all([
+    prisma.task.count({ where: { assignee_id: userId, status: "todo" } }),
+    prisma.task.count({ where: { assignee_id: userId, status: "in_progress" } }),
+    prisma.task.count({ where: { assignee_id: userId, status: "done" } }),
+  ])
+
+  const assignedRows = await prisma.task.findMany({
+    where: { assignee_id: userId },
+    select: {
+      project_id: true,
+      status: true,
+      project: { select: { id: true, name: true } },
+    },
+  })
+
+  const byProjectMap = new Map<
+    string,
+    { projectId: string; projectName: string; todo: number; in_progress: number; done: number }
+  >()
+  for (const row of assignedRows) {
+    const pid = row.project_id
+    let entry = byProjectMap.get(pid)
+    if (!entry) {
+      entry = {
+        projectId: row.project.id,
+        projectName: row.project.name,
+        todo: 0,
+        in_progress: 0,
+        done: 0,
+      }
+      byProjectMap.set(pid, entry)
+    }
+    if (row.status === "todo") entry.todo += 1
+    else if (row.status === "in_progress") entry.in_progress += 1
+    else if (row.status === "done") entry.done += 1
+  }
+  const byProject = Array.from(byProjectMap.values()).sort((a, b) =>
+    a.projectName.localeCompare(b.projectName)
+  )
+
+  const recent5Tasks = await prisma.task.findMany({
+    where: { assignee_id: userId },
+    orderBy: { created_at: "desc" },
+    take: 5,
+    include: {
+      project: { select: { id: true, name: true } },
+      assignee: { select: { id: true, name: true, email: true } },
+    },
+  })
+
+  return {
+    todo,
+    in_progress,
+    done,
+    byProject,
+    recent5Tasks,
+  }
+}

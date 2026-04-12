@@ -202,3 +202,34 @@ export const getProjectUsers = async(
     })
     return users
 }
+
+export const projectStats = async(
+    projectId:string,
+)=>{
+    const [todo, in_progress, done] = await Promise.all([
+        prisma.task.count({ where: { project_id: projectId, status: "todo" } }),
+        prisma.task.count({ where: { project_id: projectId, status: "in_progress" } }),
+        prisma.task.count({ where: { project_id: projectId, status: "done" } })
+      ])
+
+    const recent5Tasks = await prisma.task.findMany({
+        where:{
+            project_id:projectId
+        },
+        orderBy:{
+            created_at:"desc"
+        },
+        take:5,
+        include:{
+            assignee:{
+                select:{ id:true, name:true, email:true },
+            },
+        },
+    })
+    return {
+        todo,
+        in_progress,
+        done,
+        recent5Tasks
+    }
+}

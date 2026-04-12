@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { loginSchema, registerSchema } from "../schema/auth.schema"
-import { getProfile, getUsers, loginUser, registerUser } from "../services/auth.service"
+import { getProfile, getUsers, getUserStats, loginUser, registerUser } from "../services/auth.service"
 import { handleError } from "../utils/error"
 import { successResponse } from "../utils/response"
 
@@ -38,6 +38,15 @@ export const getUsersController = async (req: Request, res: Response) => {
   try {
     const q = req.query.q as string
     const data = await getUsers(q)
+    res.status(200).json(successResponse(data))
+  } catch (err) {
+    handleError(err, res)
+  }
+}
+
+export const getUserStatsController = async (req: Request, res: Response) => {
+  try {
+    const data = await getUserStats(req.user?.userId as string)
     res.status(200).json(successResponse(data))
   } catch (err) {
     handleError(err, res)

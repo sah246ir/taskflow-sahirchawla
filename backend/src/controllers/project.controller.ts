@@ -12,6 +12,7 @@ import {
   getProjectUsers,
   getProjects,
   UpdateProject,
+  projectStats,
 } from "../services/project.service"
 import { handleError } from "../utils/error"
 import { successResponse } from "../utils/response"
@@ -86,6 +87,16 @@ export const deleteProjectController = async (req: Request, res: Response) => {
     const { projectId } = projectIdParamSchema.parse(req.params)
     await DeleteProject(req.user!.userId, projectId)
     res.status(204).send()
+  } catch (err) {
+    handleError(err, res)
+  }
+}
+
+export const getProjectStatsController = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = projectIdParamSchema.parse(req.params)
+    const stats = await projectStats(projectId)
+    res.status(200).json(successResponse(stats))
   } catch (err) {
     handleError(err, res)
   }
