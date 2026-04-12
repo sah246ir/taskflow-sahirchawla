@@ -3,7 +3,7 @@ import { Typeface } from '../../typeface'
 import { cn } from '@/lib/utils'
 import type { SidebarNavEntry } from '../constants'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ChevronRightIcon, LayoutList, PencilIcon, Plus, TrashIcon } from 'lucide-react'
+import { ChevronRightIcon, ChevronUpIcon, LayoutList, PencilIcon, Plus, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   Command,
@@ -24,12 +24,17 @@ import { ROUTES } from '@/config/routes'
 export type SidebarButtonProps = {
   active?: boolean
   item: SidebarNavEntry
+  /** Popover content placement. Default `right` (sidebar); use `top` for bottom bar. */
+  side?: 'top' | 'right' | 'bottom' | 'left'
+  variant?: 'sidebar' | 'bottomBar'
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'>
 
 export const ProjectsSidebarPopover = ({
   item,
   className,
   type = 'button',
+  side = 'right',
+  variant = 'sidebar',
   ...props
 }: SidebarButtonProps) => {
   const {id} = useParams()
@@ -64,20 +69,43 @@ export const ProjectsSidebarPopover = ({
           <button
             type={type}
             className={cn(
-              'flex w-full items-center justify-between gap-2 rounded-md mb-1 p-2 text-left',
+              variant === 'bottomBar'
+                ? 'flex flex-1 w-full flex-col items-center justify-center gap-0.5 rounded-none mb-0 min-h-14 min-w-0 px-1 py-2 text-center'
+                : 'flex w-full items-center justify-between gap-2 rounded-md mb-1 p-2 text-left',
               active ? 'bg-blue-50 text-blue-800' : 'hover:bg-blue-50/50',
               className
             )}
             {...props}
           >
-            <Typeface size='sm' as='p' variant='regular' className='flex items-center gap-2 text-inherit'>
-              <span>{icon}</span>
+            <Typeface
+              size={variant === 'bottomBar' ? 'xs' : 'sm'}
+              as="p"
+              variant="regular"
+              className={cn(
+                'text-inherit',
+                variant === 'bottomBar'
+                  ? 'flex flex-col items-center gap-0.5'
+                  : 'flex flex-1 items-center gap-2'
+              )}
+            >
+              <span className="shrink-0">{icon}</span>
               {title}
             </Typeface>
-            <ChevronRightIcon className='w-4 h-4 shrink-0' />
+            {variant === 'sidebar' ? (
+              side === 'top' ? (
+                <ChevronUpIcon className="h-4 w-4 shrink-0" />
+              ) : (
+                <ChevronRightIcon className="h-4 w-4 shrink-0" />
+              )
+            ) : null}
           </button>
         </PopoverTrigger>
-        <PopoverContent sideOffset={15} side='right' align='start' className='w-80 p-0'>
+        <PopoverContent
+          sideOffset={side === 'top' ? 8 : 15}
+          side={side}
+          align={side === 'top' ? 'center' : 'start'}
+          className="w-80 max-w-[min(100vw-1rem,20rem)] p-0"
+        >
           <Command>
             <CommandInput placeholder="Search projects…" />
             <CommandList> 
@@ -86,7 +114,7 @@ export const ProjectsSidebarPopover = ({
                 <div className="max-h-[185px] overflow-y-auto">
                   {projects.map((project) => (
                     <CommandItem
-                      key={project.title}
+                      key={project.id}
                       value={`${project.title} ${project.description}`}
                       onSelect={() => {
                         setPopoverOpen(false)

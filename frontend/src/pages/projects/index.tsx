@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DataTable } from '@/components/ui/table/DataTable'
 import { CardWrapper } from '@/components/ui/wrappers/CardWrapper'
 import { ROUTES } from '@/config/routes'
+import { Typeface } from '@/components/ui/typeface'
 
 const toProjectDetail = (id: string) => ROUTES.PROJECT_DETAIL.replace(':id', id)
 
@@ -64,14 +65,14 @@ const ProjectsPage = () => {
 
   return (
     <PageLayout title="Projects" description="Manage your projects.">
-      <CardWrapper>
-        <div className="mb-4 flex justify-end">
+      <CardWrapper className='p-4'>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <Typeface color='primary' size='lg' as='h1' variant='medium'>
+            All Projects
+          </Typeface>
           <Button
             type="button"
-            onClick={() => {
-              setEditingProject(null)
-              setCreateOpen(true)
-            }}
+            onClick={() => setCreateOpen(true)}
           >
             New project
           </Button>

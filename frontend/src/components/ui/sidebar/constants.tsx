@@ -21,6 +21,10 @@ export type SidebarItem = {
     items: SidebarNavEntry[];
 };
 
+/** Single list of nav entries (Menu + Account) for compact layouts e.g. mobile bottom bar. */
+export const flattenSidebarNavEntries = (sections: SidebarItem[]): SidebarNavEntry[] =>
+    sections.flatMap((section) => section.items);
+
 export const SIDEBAR_ITEMS = (projects: ProjectListData[]): SidebarItem[] => [
     {
         title: 'Menu',

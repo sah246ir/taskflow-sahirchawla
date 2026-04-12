@@ -33,7 +33,7 @@ export function TaskFiltersToolbar({
   const users = usersRes?.data ?? []
 
   return (
-    <div className="flex flex-wrap items-end gap-4">
+    <div className="sm:flex grid grid-cols-1 w-full flex-wrap items-end gap-4">
       <div className="flex min-w-[140px] flex-col gap-1.5">
         <Label className="text-xs text-muted-foreground">Status</Label>
         <Select

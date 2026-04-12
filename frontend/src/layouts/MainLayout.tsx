@@ -5,9 +5,9 @@ export const MainLayout = () => {
     return (
         <ProtectedLayout>
 
-            <div className="flex p-4 gap-4">
+            <div className="flex gap-4 p-4">
                 <Sidebar />
-                <div className='grow'>
+                <div className="min-w-0 grow pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
                     <Outlet />
                 </div>
             </div>

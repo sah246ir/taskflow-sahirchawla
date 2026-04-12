@@ -100,13 +100,13 @@ export function DataTable<TData>({
 
   return (
     <div className="w-full">
-      <div className="overflow-hidden rounded-t-md">
-        <Table className="bg-white border-0">
+      <div className="overflow-x-auto rounded-t-md">
+        <Table className="bg-white border-0 table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead style={{ width: header.getSize() }} key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -123,7 +123,7 @@ export function DataTable<TData>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="truncate">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

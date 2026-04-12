@@ -27,15 +27,18 @@ ColumnDef<TaskListData[number]>[] =>
   {
     header: 'Title',
     accessorKey: 'title',
+    size: 100,
   },
   {
     header: 'Description',
     accessorKey: 'description',
+    size: 100,
   },
   {
     header: 'Due Date',
     accessorKey: 'due_date',
     cell: ({ row }) => row.original.due_date ? formatDate(row.original.due_date) : '-',
+    size: 100,
   },
   {
     header: 'Priority',
@@ -56,6 +59,7 @@ ColumnDef<TaskListData[number]>[] =>
         </DropdownMenu>
       )
     },
+    size: 100,
   },
   {
     header: 'Status',
@@ -76,6 +80,7 @@ ColumnDef<TaskListData[number]>[] =>
         </DropdownMenu>
       )
     },
+    size: 100,
   },
   {
     header: 'Assigned To',
@@ -98,5 +103,6 @@ ColumnDef<TaskListData[number]>[] =>
     cell: ({ row }) => {
       return <TableActionDropdown items={[{ title: 'Edit', onClick: () => onAction(row.original, 'edit') }, { title: 'Delete', onClick: () => onAction(row.original, 'delete') }]} />
     },
+    size: 100,
   },
 ]

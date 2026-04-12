@@ -22,6 +22,7 @@ export const getProjectColumns = (
         {row.original.name}
       </Link>
     ),
+    size: 100,
   },
   {
     header: 'Description',
@@ -30,11 +31,13 @@ export const getProjectColumns = (
       const d = row.original.description?.trim()
       return d ? d : '—'
     },
+    size: 130,
   },
   {
     header: 'Created',
     accessorKey: 'created_at',
     cell: ({ row }) => formatDate(row.original.created_at),
+    size: 100,
   },
   {
     header: 'Actions',
@@ -53,5 +56,6 @@ export const getProjectColumns = (
         ]}
       />
     ),
+    size: 100,
   },
 ]
