@@ -2,9 +2,8 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  createTaskRequestSchema,
-  type CreateTaskFormValues,
-  type CreateTaskRequest,
+  createTaskSchema,
+  type createTaskSchemaType
 } from '@/schema/tasks.schema'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createTask } from '@/services/tasks.service'
@@ -26,7 +25,7 @@ type CreateTaskDialogProps = {
   projectId: string
 }
 
-const defaultFormValues: CreateTaskFormValues = {
+const defaultFormValues: createTaskSchemaType = {
   title: '',
   description: '',
   status: 'todo',
@@ -40,9 +39,9 @@ export const CreateTaskDialog = ({
   projectId,
 }: CreateTaskDialogProps) => {
   const queryClient = useQueryClient()
-  const form = useForm<CreateTaskFormValues, unknown, CreateTaskRequest>({
+  const form = useForm<createTaskSchemaType, unknown, createTaskSchemaType>({
     defaultValues: defaultFormValues,
-    resolver: zodResolver(createTaskRequestSchema),
+    resolver: zodResolver(createTaskSchema),
   })
   const { reset } = form
 
@@ -53,7 +52,7 @@ export const CreateTaskDialog = ({
   }, [isOpen, reset])
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (body: CreateTaskRequest) => createTask(projectId, body),
+    mutationFn: (body: createTaskSchemaType) => createTask(projectId, body),
     onSuccess: () => {
       toast.success('Task created')
       queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
@@ -61,7 +60,7 @@ export const CreateTaskDialog = ({
     },
   })
 
-  const onSubmit = (data: CreateTaskRequest) => {
+  const onSubmit = (data: createTaskSchemaType) => {
     mutate({
       title: data.title,
       description: data.description?.trim() ? data.description : undefined,

@@ -35,7 +35,7 @@ export const SIDEBAR_ITEMS = (projects: ProjectListData[]): SidebarItem[] => [
                 projects: projects.map((p) => ({
                     title: p.name,
                     description: p.description,
-                    href: `${ROUTES.PROJECTS}/${p.id}`,
+                    href: ROUTES.PROJECT_DETAIL.replace(':id', p.id),
                 })),
             },
             {
