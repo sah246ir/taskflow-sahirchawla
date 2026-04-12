@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Typeface } from '../../typeface'
 import { cn } from '@/lib/utils'
 import type { SidebarNavEntry } from '../constants'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { ChevronRightIcon, Plus } from 'lucide-react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { ChevronRightIcon, PencilIcon, Plus, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   Command,
@@ -14,6 +14,12 @@ import {
   CommandList,
 } from '@/components/shadcn/command'
 import { CreateProjectDialog } from '@/pages/projects/components/CreateProjectDialog'
+import { deleteProject} from '@/services/projects.service'
+import { useMutation } from '@tanstack/react-query'
+import { queryClient } from '@/config/queryClient'
+import { toast } from 'sonner'
+import { ConfirmDialog } from '../../dialogs/ConfirmDialog'
+import { ROUTES } from '@/config/routes'
 
 export type SidebarButtonProps = {
   active?: boolean
@@ -26,14 +32,31 @@ export const ProjectsSidebarPopover = ({
   type = 'button',
   ...props
 }: SidebarButtonProps) => {
+  const {id} = useParams()
   const navigate = useNavigate()
   const { title, icon } = item
   const active = useLocation().pathname === item.href
   const projects = item.projects ?? []
   const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false)
+  
+  const [projectAction, setProjectAction] = useState<{action: 'delete' | 'edit', project: SidebarNavEntry["projects"][number]} | null>(null)
+  const deleteMutation = useMutation({
+    mutationFn: (projectId: string) => deleteProject(projectId),
+    onSuccess: () => {
+      if (id === projectAction?.project.id) {
+        navigate(ROUTES.PROJECTS)
+      }
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      setProjectAction(null)
+      toast.success("Project deleted successfully")
+    },
+    onError: () => {
+    }
+  })
+
+
   return (
     <>
-    <CreateProjectDialog isOpen={createProjectDialogOpen} setOpen={setCreateProjectDialogOpen} />
     <div className="">
       <Popover>
         <PopoverTrigger asChild>
@@ -67,9 +90,29 @@ export const ProjectsSidebarPopover = ({
                       navigate(project.href)
                     }}
                   >
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                      <span className="truncate font-medium">{project.title}</span>
-                      <span className="truncate text-xs text-muted-foreground">{project.description}</span>
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="truncate font-medium">{project.title}</span>
+                        <span className="truncate text-xs text-muted-foreground">{project.description}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                      <button
+                        className='cursor-pointer'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setProjectAction({action: 'edit', project})
+                        }}>
+                          <PencilIcon className='w-4 h-4 text-blue-600' />
+                        </button>
+                        <button
+                        className='cursor-pointer'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setProjectAction({action: 'delete', project})
+                        }}>
+                          <TrashIcon className='w-4 h-4 text-destructive' />
+                        </button>
+                      </div>
                     </div>
                   </CommandItem>
                 ))}
@@ -84,6 +127,31 @@ export const ProjectsSidebarPopover = ({
           </Command>
         </PopoverContent>
       </Popover>
+
+      <ConfirmDialog
+        isOpen={projectAction?.action === 'delete'}
+        setOpen={() => setProjectAction(null)}
+        onCancel={() => setProjectAction(null)}
+        onConfirm={() => {
+          deleteMutation.mutate(projectAction.project.id)
+        }}
+        title="Delete Project"
+        description="Are you sure you want to delete this project?"
+        confirmText="Delete"
+      >
+        Are you sure you want to delete this project?
+        all the associated data will also be deleted.
+      </ConfirmDialog>
+    <CreateProjectDialog 
+    isOpen={createProjectDialogOpen || projectAction?.action === 'edit'}  
+    setOpen={()=>{
+      setCreateProjectDialogOpen(false)
+      setProjectAction(null)
+    }} 
+    id={projectAction?.project?.id}
+    initialValues={projectAction?.project ? { name: projectAction.project.title, description: projectAction.project.description } : undefined}
+    />
+
     </div>
     </>
   )

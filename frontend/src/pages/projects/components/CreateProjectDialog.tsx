@@ -4,26 +4,31 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createProjectSchema,
   type CreateProjectSchemaType,
+  type UpdateProjectSchemaType,
 } from '@/schema/projects.schema'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createProject } from '@/services/projects.service'
+import { useMutation, } from '@tanstack/react-query'
+import { createProject, updateProject } from '@/services/projects.service'
 import { ConfirmDialog } from '@/components/ui/dialogs/ConfirmDialog'
 import { FormItem } from '@/components/ui/form/formItem'
 import { Label } from '@/components/shadcn/label'
 import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
 import { toast } from 'sonner'
+import { queryClient } from '@/config/queryClient'
 
 type CreateProjectDialogProps = {
   isOpen: boolean
   setOpen: (open: boolean) => void
+  id?: string
+  initialValues?: UpdateProjectSchemaType
 }
 
 export const CreateProjectDialog = ({
   isOpen,
   setOpen,
-}: CreateProjectDialogProps) => {
-  const queryClient = useQueryClient()
+  id,
+  initialValues,
+}: CreateProjectDialogProps) => { 
   const form = useForm({
     defaultValues: {
       name: '',
@@ -39,6 +44,12 @@ export const CreateProjectDialog = ({
     }
   }, [isOpen, reset])
 
+  useEffect(() => {
+    if (initialValues) {
+      reset({ name: initialValues.name, description: initialValues.description })
+    }
+  }, [initialValues, reset])
+
   const { mutate, isPending } = useMutation({
     mutationFn: createProject,
     onSuccess: () => {
@@ -46,24 +57,43 @@ export const CreateProjectDialog = ({
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       setOpen(false)
     },
+    onError: () => {
+    }
+  })
+  const { mutate: updateProjectMutation, isPending: isUpdateProjectPending } = useMutation({
+    mutationFn: ({projectId, data}: {projectId: string, data: UpdateProjectSchemaType}) => updateProject(projectId, data),
+    onSuccess: () => {
+      toast.success('Project updated successfully')
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      setOpen(false)
+    },
+    onError: () => {
+    }
   })
 
   const onSubmit = (data: CreateProjectSchemaType) => {
-    mutate({
+    if (id) {
+      updateProjectMutation({ projectId: id, data: {
+        name: data.name,
+        description: data.description?.trim() ? data.description : undefined,
+      } })
+    } else {
+      mutate({
       name: data.name,
       description: data.description?.trim() ? data.description : undefined,
     })
+  }
   }
   const { errors } = form.formState
   return (
     <ConfirmDialog
       isOpen={isOpen}
       setOpen={setOpen}
-      title="Create project"
-      description="Add a new project to your workspace."
-      confirmText="Create project"
+      title={id ? 'Update project' : 'Create project'}
+      description={id ? 'Update the project details' : 'Add a new project to your workspace.'}
+      confirmText={id ? 'Update project' : 'Create project'}
       cancelText="Cancel"
-      isConfirmLoading={isPending}
+      isConfirmLoading={isPending || isUpdateProjectPending}
       onConfirm={() => {
         void form.handleSubmit(onSubmit)()
       }}

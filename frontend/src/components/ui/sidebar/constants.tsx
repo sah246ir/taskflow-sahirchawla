@@ -12,6 +12,7 @@ export type SidebarNavEntry = {
         title: string;
         description: string;
         href: string;
+        id: string;
     }[];
 };
 
@@ -37,6 +38,7 @@ export const SIDEBAR_ITEMS = (projects: ProjectListData[]): SidebarItem[] => [
                     title: p.name,
                     description: p.description,
                     href: ROUTES.PROJECT_DETAIL.replace(':id', p.id),
+                    id: p.id,
                 })),
             },
             {

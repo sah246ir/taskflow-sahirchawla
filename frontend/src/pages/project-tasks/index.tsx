@@ -87,7 +87,6 @@ const ProjectTasksPage = () => {
       setTaskAction(null)
     },
     onError: () => {
-      toast.error('Could not delete this task. Try again.')
     },
   })
   const onAction = (task: TaskListData[number], action: 'edit' | 'delete') => {

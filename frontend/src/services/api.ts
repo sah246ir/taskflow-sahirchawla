@@ -1,5 +1,6 @@
 import axios from "axios"
 import { ENV } from "../config/env"
+import { toast } from "sonner"
 
 /** Path prefix when `VITE_API_URL` is the server origin (e.g. `http://localhost:8000`). */
 const API_V1 = "/api/v1/"
@@ -22,7 +23,10 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem("token")
       window.location.href = "/login"
+    }else{
+      toast.error(err.response?.data?.error || 'An error occurred')
     }
+
     return Promise.reject(err)
   }
 )
