@@ -21,9 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/shadcn/table"
-import { Button } from "@/components/shadcn/button"
 import TableFallback from "./components/TableFallback"
 import TableLoader from "./components/TableLoader"
+import { DataTablePagination } from "./components/DataTablePagination"
 
 type DataTableProps<TData> = {
   columns: ColumnDef<TData>[]
@@ -55,6 +55,25 @@ export function DataTable<TData>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [internalPagination, setInternalPagination] =
+    React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
+
+  const paginationState =
+    pagination !== undefined ? pagination : internalPagination
+
+  const handlePaginationChange = React.useCallback(
+    (updaterOrValue: PaginationState | ((old: PaginationState) => PaginationState)) => {
+      const next =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(paginationState)
+          : updaterOrValue
+      onPaginationChange?.(next)
+      if (pagination === undefined) {
+        setInternalPagination(next)
+      }
+    },
+    [pagination, paginationState, onPaginationChange]
+  )
 
   const table = useReactTable({
     data,
@@ -66,13 +85,13 @@ export function DataTable<TData>({
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination: pagination ?? { pageIndex: 0, pageSize: 10 },
+      pagination: paginationState,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: onPaginationChange ? (updaterOrValue) => onPaginationChange(updaterOrValue as PaginationState) : undefined,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -81,7 +100,7 @@ export function DataTable<TData>({
 
   return (
     <div className="w-full">
-      <div className="overflow-hidden rounded- ">
+      <div className="overflow-hidden rounded-t-md">
         <Table className="bg-white border-0">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -117,7 +136,11 @@ export function DataTable<TData>({
                     isLoading ? (
                       <TableLoader />
                     ) : (
-                      <TableFallback title={fallback?.title} description={fallback?.description} cta={fallback?.cta} />
+                      <TableFallback
+                        title={fallback?.title ?? "No data"}
+                        description={fallback?.description}
+                        cta={fallback?.cta}
+                      />
                     )
                   }
                 </TableCell>
@@ -126,30 +149,7 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4 bg-white px-[16px]">
-        {/* <div className="text-sm text-muted-foreground flex-1">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div> */}
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      {table.getRowModel().rows.length ? <DataTablePagination table={table} /> : null}
     </div>
   )
 }

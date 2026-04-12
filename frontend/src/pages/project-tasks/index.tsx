@@ -1,6 +1,7 @@
 import { PageLayout } from '@/layouts/PageLayout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import type { PaginationState } from '@tanstack/react-table'
 import { Button } from '@/components/shadcn/button'
 import { CreateTaskDialog } from './components/CreateTaskDialog'
 import { deleteTask, listTasks, updateTask, type TaskListData } from '@/services/tasks.service'
@@ -18,10 +19,36 @@ const ProjectTasksPage = () => {
   const { id: projectId } = useParams<{ id: string }>()
   const [createOpen, setCreateOpen] = useState(false)
   const [taskAction, setTaskAction] = useState<{action: 'edit' | 'delete', task: TaskListData[number]} | null>(null)
-  const { data,refetch, isLoading } = useQuery({
-    queryKey: ['tasks', projectId],
-    queryFn: () => listTasks(projectId),
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   })
+
+  useEffect(() => {
+    setPagination({ pageIndex: 0, pageSize: 10 })
+  }, [projectId])
+
+  const { data, refetch, isLoading, isFetching } = useQuery({
+    queryKey: ['tasks', projectId, pagination.pageIndex, pagination.pageSize],
+    queryFn: () =>
+      listTasks(projectId!, {
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+      }),
+    enabled: Boolean(projectId),
+  })
+
+  useEffect(() => {
+    if (!data?.data.meta || isFetching) return
+    const m = data.data.meta
+    setPagination((prev) => {
+      const pageIndex =
+        m.totalPages <= 0 ? 0 : Math.min(Math.max(0, m.page - 1), m.totalPages - 1)
+      const next = { pageIndex, pageSize: m.limit }
+      if (prev.pageIndex === next.pageIndex && prev.pageSize === next.pageSize) return prev
+      return next
+    })
+  }, [data?.data.meta, isFetching])
   const { mutate: updateTaskMutation } = useMutation({
     mutationFn: ({body, taskId}: {body: updateTaskSchemaType, taskId: string}) => updateTask(taskId, body),
     onSuccess: () => {
@@ -66,6 +93,10 @@ const ProjectTasksPage = () => {
         <DataTable
         columns={taskColumns}
         data={data?.data.tasks || []}
+        manualPagination
+        pageCount={Math.max(1, data?.data.meta?.totalPages ?? 1)}
+        pagination={pagination}
+        onPaginationChange={setPagination}
         fallback={{
           title: 'No tasks found',
           description: 'Create a new task to get started.',
@@ -95,7 +126,10 @@ const ProjectTasksPage = () => {
           setOpen={() => setTaskAction(null)}
           confirmText='Delete'
           cancelText='Cancel'
-          onConfirm={() => deleteTaskMutation(taskAction?.task?.id)}
+          onConfirm={() => {
+            const id = taskAction?.task?.id
+            if (id) deleteTaskMutation(id)
+          }}
           isConfirmLoading={isDeleting}
         >
           the selected task '{taskAction?.task?.title}' will be deleted permanently.
