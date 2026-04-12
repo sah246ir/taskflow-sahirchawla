@@ -1,5 +1,4 @@
 import { PageLayout } from '@/layouts/PageLayout'
-import React from 'react'
 
 const index = () => {
   return (

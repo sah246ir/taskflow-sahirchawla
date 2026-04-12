@@ -1,15 +1,15 @@
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginSchemaType } from '@/schema/auth.schema'
 import { useMutation } from '@tanstack/react-query'
 import { login } from '@/services/auth.service'
 import { Input } from '@/components/shadcn/input'
-import { Button } from '@/components/shadcn/button'
 import { FormItem } from '@/components/ui/form/formItem'
 import { Label } from '@/components/shadcn/label'
 import { toast } from 'sonner'
 import { LoadingButton } from '@/components/ui/buttons/LoadingButton'
+import { Link } from 'react-router-dom'
+import { ROUTES } from '@/config/routes'
 
 const index = () => {
   const {mutate:submit,isPending} = useMutation({
@@ -41,11 +41,17 @@ const index = () => {
             </FormItem>
             <FormItem>
               <Label>Password</Label>
-              <Input {...form.register('password')} />
+              <Input type="password" {...form.register('password')} />
             </FormItem>
             <LoadingButton isLoading={isPending} className='mt-8' type='submit'>Login</LoadingButton>
           </div>
         </form>
+        <p className="text-sm text-center mt-4 text-muted-foreground">
+          Need an account?{' '}
+          <Link to={ROUTES.REGISTER} className="text-blue-600 underline hover:text-blue-800">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   )
