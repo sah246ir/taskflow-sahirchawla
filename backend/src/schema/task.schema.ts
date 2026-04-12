@@ -1,15 +1,16 @@
 import z from "zod"
 import { TaskPriority, TaskStatus } from "../generated/prisma/client"
 
-export const projectIdParamSchema = z.object({
+export const taskProjectIdParamSchema = z.object({
   projectId: z.string().uuid(),
 })
 
 export const listTasksQuerySchema = z.object({
-  status: z.enum(TaskStatus).optional(),
-  assignee: z.string().uuid().optional(),
+  status: z.enum(TaskStatus).array().optional(),
+  assignee: z.string().array().optional(),
   page: z.coerce.number().int().positive().optional(),
   limit: z.coerce.number().int().positive().max(100).optional(),
+  priority: z.enum(TaskPriority).array().optional(),
 })
 
 export const createTaskSchema = z.object({
@@ -21,7 +22,7 @@ export const createTaskSchema = z.object({
   due_date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
+    .optional().nullable(),
 })
 
 export const taskIdParamSchema = z.object({
