@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Typeface } from '../../typeface'
 import { cn } from '@/lib/utils'
 import type { SidebarNavEntry } from '../constants'
@@ -20,6 +20,8 @@ import { queryClient } from '@/config/queryClient'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '../../dialogs/ConfirmDialog'
 import { ROUTES } from '@/config/routes'
+import { AuthenticationContext } from '@/context/AuthenticationContext'
+import { Badge } from '@/components/shadcn/badge'
 
 export type SidebarButtonProps = {
   active?: boolean
@@ -59,8 +61,8 @@ export const ProjectsSidebarPopover = ({
     onError: () => {
     }
   })
-
-
+  const authContext = useContext(AuthenticationContext)
+  
   return (
     <>
     <div className="">
@@ -112,7 +114,9 @@ export const ProjectsSidebarPopover = ({
               <CommandEmpty>No projects found.</CommandEmpty>
               <CommandGroup heading="Projects">
                 <div className="max-h-[185px] overflow-y-auto">
-                  {projects.map((project) => (
+                  {projects.map((project) => {
+                    const isOwner = project.owner_id === authContext?.user?.id
+                    return(
                     <CommandItem
                       key={project.id}
                       value={`${project.title} ${project.description}`}
@@ -123,7 +127,15 @@ export const ProjectsSidebarPopover = ({
                     >
                       <div className="flex items-center justify-between gap-2 w-full">
                         <div className="flex min-w-0 flex-col gap-0.5">
-                          <span className="truncate font-medium">{project.title}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="truncate font-medium">{project.title}</span>
+                            {
+                              !isOwner &&
+                              <Badge variant='purple'>
+                                External project
+                              </Badge>
+                            }
+                          </div>
                           <span className="truncate text-xs text-muted-foreground">{project.description}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -146,7 +158,7 @@ export const ProjectsSidebarPopover = ({
                         </div>
                       </div>
                     </CommandItem>
-                  ))}
+                  )})}
                 </div>
               </CommandGroup>
             </CommandList>
