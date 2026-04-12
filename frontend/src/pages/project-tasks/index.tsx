@@ -14,6 +14,7 @@ import { queryClient } from '@/config/queryClient'
 import { toast } from 'sonner'
 import type { TaskPriority, TaskStatus } from '@/schema/common.schema'
 import { ConfirmDialog } from '@/components/ui/dialogs/ConfirmDialog'
+import { getProject } from '@/services/projects.service'
 
 const ProjectTasksPage = () => {
   const { id: projectId } = useParams<{ id: string }>()
@@ -35,6 +36,12 @@ const ProjectTasksPage = () => {
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
       }),
+    enabled: Boolean(projectId),
+  })
+  const { data: projectData, isLoading: isProjectLoading, isFetching: isProjectFetching } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () =>
+     getProject(projectId!),
     enabled: Boolean(projectId),
   })
 
@@ -117,6 +124,7 @@ const ProjectTasksPage = () => {
           projectId={projectId}
           initialValues={taskAction?.task}
           taskId={taskAction?.task?.id}
+          isOwner={projectData?.data.isOwner}
         />
 
         <ConfirmDialog

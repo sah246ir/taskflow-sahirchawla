@@ -7,6 +7,7 @@ export type SidebarNavEntry = {
     title: string;
     icon: ReactNode;
     href: string;
+    onClick?: () => void;
     projects?: {
         title: string;
         description: string;
@@ -52,6 +53,10 @@ export const SIDEBAR_ITEMS = (projects: ProjectListData[]): SidebarItem[] => [
                 title: 'Logout',
                 icon: <LogOutIcon className='w-4 h-4' />,
                 href: ROUTES.LOGIN,
+                onClick: () => {
+                    localStorage.removeItem('token')
+                    window.location.href = ROUTES.LOGIN
+                }
             }
         ]
     }

@@ -7,11 +7,13 @@ export type SidebarLinkProps = {
   title: string
   href: string
   icon: React.ReactNode
+  onClick?: () => void;
 }
 
-export const SidebarLink = ({ title, href, icon }: SidebarLinkProps) => {
+export const SidebarLink = ({ title, href, icon,onClick }: SidebarLinkProps) => {
   return (
-    <NavLink
+    <>
+    {!onclick ? <NavLink
       to={href}
       className={({ isActive }) =>
         cn(
@@ -25,5 +27,17 @@ export const SidebarLink = ({ title, href, icon }: SidebarLinkProps) => {
         {title}
       </Typeface>
     </NavLink>
+    :
+    <button
+      onClick={onClick}
+      className={'flex items-center p-2 gap-2 rounded-md mb-1'}
+    >
+      <Typeface size='sm' as='p' variant='regular' className='flex items-center gap-2 text-inherit'>
+        <span>{icon}</span>
+        {title}
+      </Typeface>
+    </button>
+    }
+    </>
   )
 }
