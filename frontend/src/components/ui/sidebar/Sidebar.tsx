@@ -55,7 +55,7 @@ export const Sidebar = () => {
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-border bg-white pb-[env(safe-area-inset-bottom,0px)] sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-border bg-white pb-[env(safe-area-inset-bottom,0px)] sm:hidden"
         aria-label="Primary"
       >
         {mobileNavEntries.map((entry) =>

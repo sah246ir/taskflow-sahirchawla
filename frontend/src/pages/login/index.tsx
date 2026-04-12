@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { LoadingButton } from '@/components/ui/buttons/LoadingButton'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '@/config/routes'
+import logo from '@/assets/logo.png'
 
 const index = () => {
   const {mutate:submit,isPending} = useMutation({
@@ -32,7 +33,8 @@ const index = () => {
   }
   return (
     <div className='absolute inset-0 flex items-center justify-center'>
-      <div className=' p-4 border border-blue-400 rounded-md min-w-[500px]'>
+      <div className="w-[90%] rounded-md border border-blue-400 p-4 md:w-[500px]">
+        <img src={logo} alt="logo" width={155} className="mx-auto mb-6 block" />
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-4">
             <FormItem>

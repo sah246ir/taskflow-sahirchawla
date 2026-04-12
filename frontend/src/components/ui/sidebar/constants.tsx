@@ -44,12 +44,7 @@ export const SIDEBAR_ITEMS = (projects: ProjectListData[]): SidebarItem[] => [
                     href: ROUTES.PROJECT_DETAIL.replace(':id', p.id),
                     id: p.id,
                 })),
-            },
-            {
-                title: 'Tasks',
-                icon: <ListChecksIcon className='w-4 h-4' />,
-                href: ROUTES.PROJECT_DETAIL,
-            },
+            }
         ]
     },
     {
