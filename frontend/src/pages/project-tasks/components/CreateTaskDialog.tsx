@@ -3,26 +3,25 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createTaskSchema,
-  type createTaskSchemaType
+  type createTaskSchemaType,
 } from '@/schema/tasks.schema'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createTask } from '@/services/tasks.service'
+import { createTask, updateTask } from '@/services/tasks.service'
 import { ConfirmDialog } from '@/components/ui/dialogs/ConfirmDialog'
 import { FormItem } from '@/components/ui/form/formItem'
 import { Label } from '@/components/shadcn/label'
 import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-
-const selectClassName = cn(
-  'h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30'
-)
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
+import { type TaskPriority, type TaskStatus } from '@/schema/common.schema'
 
 type CreateTaskDialogProps = {
   isOpen: boolean
   setOpen: (open: boolean) => void
   projectId: string
+  initialValues?: createTaskSchemaType
+  taskId?: string
 }
 
 const defaultFormValues: createTaskSchemaType = {
@@ -30,13 +29,14 @@ const defaultFormValues: createTaskSchemaType = {
   description: '',
   status: 'todo',
   priority: 'medium',
-  due_date: '',
 }
 
 export const CreateTaskDialog = ({
   isOpen,
   setOpen,
   projectId,
+  initialValues,
+  taskId
 }: CreateTaskDialogProps) => {
   const queryClient = useQueryClient()
   const form = useForm<createTaskSchemaType, unknown, createTaskSchemaType>({
@@ -51,6 +51,8 @@ export const CreateTaskDialog = ({
     }
   }, [isOpen, reset])
 
+  const { errors } = form.formState
+
   const { mutate, isPending } = useMutation({
     mutationFn: (body: createTaskSchemaType) => createTask(projectId, body),
     onSuccess: () => {
@@ -59,57 +61,97 @@ export const CreateTaskDialog = ({
       setOpen(false)
     },
   })
+  const { mutate: updateTaskMutation, isPending: isUpdatePending } = useMutation({
+    mutationFn: (body: createTaskSchemaType) => updateTask(taskId, body),
+    onSuccess: () => {
+      toast.success('Task updated successfully')
+      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
+      setOpen(false)
+    },
+  })
 
   const onSubmit = (data: createTaskSchemaType) => {
-    mutate({
-      title: data.title,
-      description: data.description?.trim() ? data.description : undefined,
-      status: data.status,
-      priority: data.priority,
-      due_date: data.due_date,
-    })
+    if (taskId) {
+      updateTaskMutation({
+        title: data.title,
+        description: data.description?.trim() ? data.description : undefined,
+        status: data.status,
+        priority: data.priority,
+        due_date: data.due_date,
+      })
+    } else {
+      mutate({
+        title: data.title,
+        description: data.description?.trim() ? data.description : undefined,
+        status: data.status,
+        priority: data.priority,
+        due_date: data.due_date,
+      })
+    }
   }
+
+  useEffect(() => {
+    if (initialValues) {
+      reset(initialValues)
+    }
+  }, [initialValues, taskId, reset])
 
   return (
     <ConfirmDialog
       isOpen={isOpen}
       setOpen={setOpen}
-      title="Create task"
-      description="Add a new task to this project."
-      confirmText="Create task"
+      title={taskId ? "Update task" : "Create task"}
+      description={taskId ? "Update the task details." : "Add a new task to this project."}
+      confirmText={taskId ? "Update task" : "Create task"}
       cancelText="Cancel"
-      isConfirmLoading={isPending}
+      isConfirmLoading={isPending || isUpdatePending}
       onConfirm={() => {
         void form.handleSubmit(onSubmit)()
       }}
     >
       <div className="flex flex-col gap-4">
-        <FormItem>
+        <FormItem error={errors.title?.message}>
           <Label>Title</Label>
           <Input {...form.register('title')} />
         </FormItem>
-        <FormItem>
+        <FormItem error={errors.description?.message}>
           <Label>Description</Label>
           <Textarea rows={3} {...form.register('description')} />
         </FormItem>
         <div className="grid grid-cols-2 gap-4">
-          <FormItem>
+          <FormItem error={errors.status?.message}>
             <Label>Status</Label>
-            <select className={selectClassName} {...form.register('status')}>
-              <option value="todo">To do</option>
-              <option value="in_progress">In progress</option>
-              <option value="done">Done</option>
-            </select>
+            <Select
+              onValueChange={(value) => form.setValue('status', value as TaskStatus)}
+              value={form.watch('status')}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder="Select a status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo">To do</SelectItem>
+                <SelectItem value="in_progress">In progress</SelectItem>
+                <SelectItem value="done">Done</SelectItem>
+              </SelectContent>
+            </Select>
           </FormItem>
-          <FormItem>
+          <FormItem error={errors.priority?.message}>
             <Label>Priority</Label>
-            <select className={selectClassName} {...form.register('priority')}>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            <Select
+              onValueChange={(value) => form.setValue('priority', value as TaskPriority)}
+              value={form.watch('priority')}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder="Select a priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
           </FormItem>
-          <FormItem>
+          <FormItem error={errors.due_date?.message}>
             <Label>Due date</Label>
             <Input type="date" {...form.register('due_date')} />
           </FormItem>

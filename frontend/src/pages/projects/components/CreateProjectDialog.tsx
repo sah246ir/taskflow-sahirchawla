@@ -54,7 +54,7 @@ export const CreateProjectDialog = ({
       description: data.description?.trim() ? data.description : undefined,
     })
   }
-
+  const { errors } = form.formState
   return (
     <ConfirmDialog
       isOpen={isOpen}
@@ -69,11 +69,11 @@ export const CreateProjectDialog = ({
       }}
     >
       <div className="flex flex-col gap-4">
-        <FormItem>
+        <FormItem error={errors.name?.message}>
           <Label>Name</Label>
           <Input {...form.register('name')} />
         </FormItem>
-        <FormItem>
+        <FormItem error={errors.description?.message}>
           <Label>Description</Label>
           <Textarea rows={3} {...form.register('description')} />
         </FormItem>
