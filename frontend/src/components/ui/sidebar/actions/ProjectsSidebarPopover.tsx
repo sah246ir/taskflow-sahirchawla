@@ -3,7 +3,7 @@ import { Typeface } from '../../typeface'
 import { cn } from '@/lib/utils'
 import type { SidebarNavEntry } from '../constants'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ChevronRightIcon, PencilIcon, Plus, TrashIcon } from 'lucide-react'
+import { ChevronRightIcon, LayoutList, PencilIcon, Plus, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   Command,
@@ -37,6 +37,7 @@ export const ProjectsSidebarPopover = ({
   const { title, icon } = item
   const active = useLocation().pathname === item.href
   const projects = item.projects ?? []
+  const [popoverOpen, setPopoverOpen] = useState(false)
   const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false)
   
   const [projectAction, setProjectAction] = useState<{action: 'delete' | 'edit', project: SidebarNavEntry["projects"][number]} | null>(null)
@@ -58,7 +59,7 @@ export const ProjectsSidebarPopover = ({
   return (
     <>
     <div className="">
-      <Popover>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger asChild>
           <button
             type={type}
@@ -79,51 +80,73 @@ export const ProjectsSidebarPopover = ({
         <PopoverContent sideOffset={15} side='right' align='start' className='w-80 p-0'>
           <Command>
             <CommandInput placeholder="Search projects…" />
-            <CommandList>
+            <CommandList> 
               <CommandEmpty>No projects found.</CommandEmpty>
               <CommandGroup heading="Projects">
-                {projects.map((project) => (
-                  <CommandItem
-                    key={project.title}
-                    value={`${project.title} ${project.description}`}
-                    onSelect={() => {
-                      navigate(project.href)
-                    }}
-                  >
-                    <div className="flex items-center justify-between gap-2 w-full">
-                      <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="truncate font-medium">{project.title}</span>
-                        <span className="truncate text-xs text-muted-foreground">{project.description}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                      <button
-                        className='cursor-pointer'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setProjectAction({action: 'edit', project})
-                        }}>
-                          <PencilIcon className='w-4 h-4 text-blue-600' />
-                        </button>
+                <div className="max-h-[185px] overflow-y-auto">
+                  {projects.map((project) => (
+                    <CommandItem
+                      key={project.title}
+                      value={`${project.title} ${project.description}`}
+                      onSelect={() => {
+                        setPopoverOpen(false)
+                        navigate(project.href)
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="flex min-w-0 flex-col gap-0.5">
+                          <span className="truncate font-medium">{project.title}</span>
+                          <span className="truncate text-xs text-muted-foreground">{project.description}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
                         <button
-                        className='cursor-pointer'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setProjectAction({action: 'delete', project})
-                        }}>
-                          <TrashIcon className='w-4 h-4 text-destructive' />
-                        </button>
+                          className='cursor-pointer'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setProjectAction({action: 'edit', project})
+                          }}>
+                            <PencilIcon className='w-4 h-4 text-blue-600' />
+                          </button>
+                          <button
+                          className='cursor-pointer'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setProjectAction({action: 'delete', project})
+                          }}>
+                            <TrashIcon className='w-4 h-4 text-destructive' />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </CommandItem>
-                ))}
+                    </CommandItem>
+                  ))}
+                </div>
               </CommandGroup>
             </CommandList>
-            <button onClick={() => setCreateProjectDialogOpen(true)} className='flex items-center gap-2 p-2 hover:bg-hover-action-background-faded cursor-pointer'>
-              <Plus className='w-4 h-4 text-muted-foreground' />
-              <Typeface as='span' size='sm' variant='regular' color='muted'>
-                New Project
-              </Typeface>
-            </button>
+            <div className="border-t border-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setPopoverOpen(false)
+                  navigate(ROUTES.PROJECTS)
+                }}
+                className="flex w-full cursor-pointer items-center gap-2 p-2 hover:bg-hover-action-background-faded"
+              >
+                <LayoutList className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Typeface as="span" size="sm" variant="regular" color="muted">
+                  View all projects
+                </Typeface>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreateProjectDialogOpen(true)}
+                className="flex w-full cursor-pointer items-center gap-2 border-t border-border p-2 hover:bg-hover-action-background-faded"
+              >
+                <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Typeface as="span" size="sm" variant="regular" color="muted">
+                  New Project
+                </Typeface>
+              </button>
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
