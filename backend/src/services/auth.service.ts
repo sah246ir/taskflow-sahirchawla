@@ -83,3 +83,21 @@ export const getProfile = async (userId:string)=>{
     if (!userById) throw new AppError('NOT_FOUND', 'user not found')
     return userById
 }
+
+export const getUsers = async (q:string) => {
+    const users = await prisma.user.findMany({
+        select:{
+            name:true,
+            email:true,
+            id:true
+        },
+        where:{
+            OR:[
+                {name: {contains: q, mode: 'insensitive'}},
+                {email: {contains: q, mode: 'insensitive'}}
+            ]
+        },
+        take:20
+    })
+    return users
+}

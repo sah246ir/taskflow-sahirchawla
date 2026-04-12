@@ -34,6 +34,15 @@ export const listTasks = async (
     orderBy: { created_at: "asc" },
     skip,
     take,
+    include:{
+      assignee:{
+        select:{
+          id:true,
+          name:true,
+          email:true,
+        },
+      },
+    }
   })
   const total = await prisma.task.count({ where })
 
@@ -52,6 +61,10 @@ export const createTask = async (
     due_date?: Date | null
   }
 ) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  })
+  const isOwner = project?.owner_id === userId
   return prisma.task.create({
     data: {
       title: input.title,
@@ -59,7 +72,7 @@ export const createTask = async (
       status: input.status ?? TaskStatus.todo,
       priority: input.priority,
       project_id: projectId,
-      assignee_id: input.assignee_id ?? undefined,
+      assignee_id: isOwner?input.assignee_id || userId:userId,
       due_date: input.due_date ?? undefined,
       creator_id: userId,
     },
