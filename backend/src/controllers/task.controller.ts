@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { TaskPriority, TaskStatus } from "../generated/prisma/client"
+import { TaskPriority, TaskStatus } from "@prisma/client"
 import {
   createTaskSchema,
   listTasksQuerySchema,

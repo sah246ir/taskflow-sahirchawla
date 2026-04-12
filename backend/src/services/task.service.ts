@@ -1,5 +1,5 @@
 import { prisma } from "../config"
-import { TaskPriority, TaskStatus } from "../generated/prisma/client"
+import { TaskPriority, TaskStatus } from "@prisma/client"
 import { PaginationQuery } from "../types"
 import { AppError } from "../utils/error"
 import { buildPaginatedResponse, getPaginationParams } from "../utils/pagination"

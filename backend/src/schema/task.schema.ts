@@ -1,5 +1,5 @@
 import z from "zod"
-import { TaskPriority, TaskStatus } from "../generated/prisma/client"
+import { TaskPriority, TaskStatus } from "@prisma/client"
 
 
 export const listTasksQuerySchema = z.object({

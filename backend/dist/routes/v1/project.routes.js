@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.projectRouter = void 0;
+const express_1 = require("express");
+const project_controller_1 = require("../../controllers/project.controller");
+const task_controller_1 = require("../../controllers/task.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const project_middleware_1 = require("../../middlewares/project.middleware");
+exports.projectRouter = (0, express_1.Router)();
+exports.projectRouter.use(auth_middleware_1.authMiddleware);
+exports.projectRouter.get("/", project_controller_1.listProjectsController);
+exports.projectRouter.post("/", project_controller_1.createProjectController);
+exports.projectRouter.get("/:projectId", project_controller_1.getProjectByIdController);
+exports.projectRouter.get("/:projectId/users", project_middleware_1.projectAccessMiddleware, project_controller_1.getProjectUsersController);
+exports.projectRouter.patch("/:projectId", project_controller_1.updateProjectController);
+exports.projectRouter.delete("/:projectId", project_controller_1.deleteProjectController);
+exports.projectRouter.get("/:projectId/tasks", project_middleware_1.projectAccessMiddleware, task_controller_1.listProjectTasksController);
+exports.projectRouter.post("/:projectId/tasks", project_middleware_1.projectAccessMiddleware, task_controller_1.createTaskController);
+exports.projectRouter.get("/:projectId/stats", project_middleware_1.projectAccessMiddleware, project_controller_1.getProjectStatsController);
+//# sourceMappingURL=project.routes.js.map

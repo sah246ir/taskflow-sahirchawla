@@ -14,14 +14,14 @@ export const loginUser = async (
     })
     if (!userByEmail) {
         throw new AppError(
-            "UNAUTHORIZED",
+            "VALIDATION_ERROR",
             "Invalid credentials"
         )
     }
     const isPasswordValid = verifyPassword(password, userByEmail.password)
     if (!isPasswordValid) {
         throw new AppError(
-            "UNAUTHORIZED",
+            "VALIDATION_ERROR",
             "Invalid credentials"
         )
     }

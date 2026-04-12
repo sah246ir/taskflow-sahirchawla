@@ -14,3 +14,7 @@ export const seed = async () => {
     console.log("Email: ", "test@example.com")
     console.log("Password: ", password)
 }
+
+seed().then(() => {
+    console.log("Seed completed")
+}).catch(console.error)
