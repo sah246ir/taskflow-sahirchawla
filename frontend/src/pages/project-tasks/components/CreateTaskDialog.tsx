@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -15,13 +15,15 @@ import { Textarea } from '@/components/shadcn/textarea'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
 import { type TaskPriority, type TaskStatus } from '@/schema/common.schema'
+import DynamicUsersDropdownSelector from './DynamicUsersDropdownSelector'
+import type { User } from '@/services/auth.service'
 
 type CreateTaskDialogProps = {
   isOpen: boolean
   setOpen: (open: boolean) => void
   projectId: string
-  initialValues?: createTaskSchemaType
-  taskId?: string
+  initialValues?: createTaskSchemaType & { assignee?: User | null }
+  taskId?: string | null
 }
 
 const defaultFormValues: createTaskSchemaType = {
@@ -29,6 +31,8 @@ const defaultFormValues: createTaskSchemaType = {
   description: '',
   status: 'todo',
   priority: 'medium',
+  assignee_id: null,
+  due_date: null,
 }
 
 export const CreateTaskDialog = ({
@@ -78,6 +82,7 @@ export const CreateTaskDialog = ({
         status: data.status,
         priority: data.priority,
         due_date: data.due_date,
+        assignee_id: selectedUser.id,
       })
     } else {
       mutate({
@@ -86,16 +91,21 @@ export const CreateTaskDialog = ({
         status: data.status,
         priority: data.priority,
         due_date: data.due_date,
+        assignee_id: selectedUser.id,
       })
     }
   }
 
   useEffect(() => {
     if (initialValues) {
-      reset(initialValues)
+      reset({
+        ...initialValues,
+        assignee_id: initialValues.assignee?.id ?? null,
+      })
+      setSelectedUser(initialValues.assignee ?? null)
     }
   }, [initialValues, taskId, reset])
-
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   return (
     <ConfirmDialog
       isOpen={isOpen}
@@ -154,6 +164,10 @@ export const CreateTaskDialog = ({
           <FormItem error={errors.due_date?.message}>
             <Label>Due date</Label>
             <Input type="date" {...form.register('due_date')} />
+          </FormItem>
+          <FormItem error={errors.assignee_id?.message}>
+            <Label>Assignee</Label>
+            <DynamicUsersDropdownSelector selectedUser={selectedUser} onChange={(value) => setSelectedUser(value)} />
           </FormItem>
         </div>
       </div>

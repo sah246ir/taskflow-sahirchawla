@@ -28,3 +28,10 @@ export async function getMe(): Promise<ApiResponse<User>> {
   const { data } = await api.get<ApiResponse<User>>("/auth/me")
   return data
 }
+
+export async function getUsers(q:string): Promise<ApiResponse<User[]>> {
+  const { data } = await api.get<ApiResponse<User[]>>("/auth/users", {
+    params: { q }
+  })
+  return data
+}

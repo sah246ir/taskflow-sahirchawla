@@ -6,6 +6,7 @@ import {
 import type { TaskPriority, TaskStatus } from "../schema/common.schema"
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
+import type { User } from "./auth.service"
 
 export type TaskListData = {
   id: string
@@ -17,6 +18,7 @@ export type TaskListData = {
   due_date: string
   created_at: string
   updated_at: string
+  assignee?: User | null
 }[]
 export type TaskListPayload = {
   tasks: TaskListData

@@ -5,6 +5,7 @@ import type { TaskPriority, TaskStatus } from "@/schema/common.schema";
 import type { TaskListData } from "@/services/tasks.service";
 import { formatDate } from "@/utils/date";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Pencil } from "lucide-react";
 
 const taskStatusMap: Record<TaskStatus, {variant: BadgevariantType,label: string}> = {
   "todo": {variant: 'default', label: 'Todo'},
@@ -75,6 +76,21 @@ ColumnDef<TaskListData[number]>[] =>
         </DropdownMenu>
       )
     },
+  },
+  {
+    header: 'Assigned To',
+    accessorKey: 'assignee',
+    cell: ({ row }) => {
+      if(!row.original.assignee) return '-'
+      return (
+        <div className="flex items-center gap-1">
+          {row.original.assignee.name}
+          <button type="button" className="p-1 rounded-md hover:bg-muted" onClick={() => onAction(row.original, 'edit')}>
+            <Pencil className="size-4 cursor-pointer text-blue-600" onClick={() => onAction(row.original, 'edit')} />
+          </button>
+        </div>
+      )
+    }
   },
   {
     header: 'Actions',

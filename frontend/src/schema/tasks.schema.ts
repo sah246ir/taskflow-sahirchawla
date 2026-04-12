@@ -19,7 +19,7 @@ export const createTaskSchema = z.object({
   description: z.string().nullable().optional(),
   status: taskStatusSchema.optional(),
   priority: taskPrioritySchema.optional(),
-  assignee_id: z.string().uuid().nullable().optional(),
+  assignee_id: z.string().nullable().optional(),
   due_date: dateSchema
 })
 

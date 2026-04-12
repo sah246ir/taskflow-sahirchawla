@@ -7,7 +7,7 @@ export const dateSchema = z
   .transform((val) => (val === "" ? undefined : val))
   .optional().nullable()
   .refine(
-    (val) => val === undefined || /^\d{4}-\d{2}-\d{2}$/.test(val),
+    (val) => val === undefined || val === null || /^\d{4}-\d{2}-\d{2}$/.test(val),
     "Invalid date format"
   )
 
