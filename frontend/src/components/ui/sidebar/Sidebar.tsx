@@ -3,7 +3,7 @@ import { CardWrapper } from '../wrappers/CardWrapper'
 import { Typeface } from '../typeface'
 import { SIDEBAR_ITEMS } from './constants'
 import { SidebarLink } from './actions/SidebarLink'
-import { SidebarButton } from './actions/SidebarPopover'
+import { ProjectsSidebarPopover } from './actions/ProjectsSidebarPopover'
 import { useQuery } from '@tanstack/react-query'
 import { listProjects } from '@/services/projects.service'
 
@@ -27,7 +27,7 @@ export const Sidebar = () => {
             <div className="p-3">
               {item.items.map((link) =>
                 link.title === 'Projects' ? (
-                  <SidebarButton key={link.title} item={link} />
+                  <ProjectsSidebarPopover key={link.title} item={link} />
                 ) : (
                   <SidebarLink key={link.title} title={link.title} href={link.href} icon={link.icon} />
                 )

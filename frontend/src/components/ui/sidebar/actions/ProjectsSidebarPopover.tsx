@@ -20,7 +20,7 @@ export type SidebarButtonProps = {
   item: SidebarNavEntry
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'>
 
-export const SidebarButton = ({
+export const ProjectsSidebarPopover = ({
   item,
   className,
   type = 'button',
