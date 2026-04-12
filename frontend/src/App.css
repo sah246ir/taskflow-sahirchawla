@@ -35,6 +35,10 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-hover-action-background: hsl(var(--hover-action-background));
+  --color-hover-action-background-faded: hsl(var(--hover-action-background-faded));
+  --color-hover-action-foreground: hsl(var(--hover-action-foreground));
 }
 
 :root {
@@ -77,6 +81,10 @@
   --priority-low: 142 71% 45%;
   --priority-medium: 38 92% 50%;
   --priority-high: 0 84% 60%;
+
+  --hover-action-background: 210 40% 94%;
+  --hover-action-foreground: 222 47% 11%; 
+  --hover-action-background-faded: 210 40% 96%;
 }
 
 .dark {
@@ -107,6 +115,10 @@
   --border: 217 33% 18%;
   --input: 217 33% 18%;
   --ring: 217 91% 60%;
+
+  --hover-action-background: 217 33% 18%;
+  --hover-action-foreground: 210 40% 98%;
+  --hover-action-background-faded: 217 33% 18%;
 }
 
 @layer base {

@@ -6,17 +6,30 @@ import {
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
 
-type ProjectListData = {
+export type ProjectListData = {
   id: string
   name: string
   description: string
   owner_id: string
   created_at: string
 }
-export async function listProjects(
-  query?: PaginationQuery
-) {
-  const { data } = await api.get<ApiResponse<ProjectListData>>("/projects", { params: query })
+
+export type ProjectListPayload = {
+  projects: ProjectListData[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
+
+export async function listProjects(query?: PaginationQuery) {
+  const { data } = await api.get<ApiResponse<ProjectListPayload>>("/projects", {
+    params: query,
+  })
   return data
 }
 
