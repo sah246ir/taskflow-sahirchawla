@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createTaskRequestSchema,
+  type CreateTaskFormValues,
   type CreateTaskRequest,
 } from '@/schema/tasks.schema'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -13,11 +14,24 @@ import { Label } from '@/components/shadcn/label'
 import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+
+const selectClassName = cn(
+  'h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30'
+)
 
 type CreateTaskDialogProps = {
   isOpen: boolean
   setOpen: (open: boolean) => void
   projectId: string
+}
+
+const defaultFormValues: CreateTaskFormValues = {
+  title: '',
+  description: '',
+  status: 'todo',
+  priority: 'medium',
+  due_date: '',
 }
 
 export const CreateTaskDialog = ({
@@ -26,18 +40,15 @@ export const CreateTaskDialog = ({
   projectId,
 }: CreateTaskDialogProps) => {
   const queryClient = useQueryClient()
-  const form = useForm({
-    defaultValues: {
-      title: '',
-      description: '',
-    },
+  const form = useForm<CreateTaskFormValues, unknown, CreateTaskRequest>({
+    defaultValues: defaultFormValues,
     resolver: zodResolver(createTaskRequestSchema),
   })
   const { reset } = form
 
   useEffect(() => {
     if (!isOpen) {
-      reset({ title: '', description: '' })
+      reset(defaultFormValues)
     }
   }, [isOpen, reset])
 
@@ -54,6 +65,9 @@ export const CreateTaskDialog = ({
     mutate({
       title: data.title,
       description: data.description?.trim() ? data.description : undefined,
+      status: data.status,
+      priority: data.priority,
+      due_date: data.due_date,
     })
   }
 
@@ -79,6 +93,28 @@ export const CreateTaskDialog = ({
           <Label>Description</Label>
           <Textarea rows={3} {...form.register('description')} />
         </FormItem>
+        <div className="grid grid-cols-2 gap-4">
+          <FormItem>
+            <Label>Status</Label>
+            <select className={selectClassName} {...form.register('status')}>
+              <option value="todo">To do</option>
+              <option value="in_progress">In progress</option>
+              <option value="done">Done</option>
+            </select>
+          </FormItem>
+          <FormItem>
+            <Label>Priority</Label>
+            <select className={selectClassName} {...form.register('priority')}>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </FormItem>
+          <FormItem>
+            <Label>Due date</Label>
+            <Input type="date" {...form.register('due_date')} />
+          </FormItem>
+        </div>
       </div>
     </ConfirmDialog>
   )
