@@ -1,21 +1,27 @@
 import {
-  createTaskSchema,
-  updateTaskSchema,
   type createTaskSchemaType,
+  type PaginationMeta,
   type updateTaskSchemaType,
 } from "../schema/tasks.schema"
+import type { TaskPriority, TaskStatus } from "../schema/common.schema"
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
 
-type TaskListData = {
+export type TaskListData = {
   id: string
   title: string
   description: string
-  status: string
-  priority: string
+  status: TaskStatus
+  priority: TaskPriority
   assignee_id: string
   due_date: string
+  created_at: string
+  updated_at: string
 }[]
+export type TaskListPayload = {
+  tasks: TaskListData
+  meta: PaginationMeta
+}
 type ListTasksQuery = {
   status?: string
   assignee?: string
@@ -26,7 +32,7 @@ export async function listTasks(
   projectId: string,
   query?: ListTasksQuery
 ) {
-  const { data } = await api.get<ApiResponse<TaskListData>>(`/projects/${projectId}/tasks`, {
+  const { data } = await api.get<ApiResponse<TaskListPayload>>(`/projects/${projectId}/tasks`, {
     params: query,
   })
   return data
