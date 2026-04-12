@@ -46,6 +46,7 @@ export const createTask = async (
   input: {
     title: string
     description?: string
+    status?: TaskStatus
     priority: TaskPriority
     assignee_id?: string | null
     due_date?: Date | null
@@ -55,7 +56,7 @@ export const createTask = async (
     data: {
       title: input.title,
       description: input.description,
-      status: TaskStatus.todo,
+      status: input.status ?? TaskStatus.todo,
       priority: input.priority,
       project_id: projectId,
       assignee_id: input.assignee_id ?? undefined,

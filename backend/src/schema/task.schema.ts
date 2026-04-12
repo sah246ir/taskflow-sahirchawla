@@ -15,6 +15,7 @@ export const listTasksQuerySchema = z.object({
 export const createTaskSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
+  status: z.enum(TaskStatus).optional(),
   priority: z.enum(TaskPriority).optional(),
   assignee_id: z.string().uuid().nullable().optional(),
   due_date: z

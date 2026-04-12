@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { TaskPriority } from "../generated/prisma/client"
+import { TaskPriority, TaskStatus } from "../generated/prisma/client"
 import {
   createTaskSchema,
   listTasksQuerySchema,
@@ -45,6 +45,7 @@ export const createTaskController = async (req: Request, res: Response) => {
     const task = await createTask(req.user!.userId, projectId, {
       title: body.title,
       description: body.description,
+      status: body.status ?? TaskStatus.todo,
       priority: body.priority ?? TaskPriority.medium,
       assignee_id: body.assignee_id,
       due_date: body.due_date ? toUtcDateOnly(body.due_date) : undefined,
