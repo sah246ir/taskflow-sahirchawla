@@ -5,6 +5,7 @@ import {
 } from "../schema/projects.schema"
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
+import type { User } from "./auth.service"
 
 export type ProjectListData = {
   id: string
@@ -62,4 +63,9 @@ export async function updateProject(
 
 export async function deleteProject(id: string) {
   await api.delete(`/projects/${id}`)
+}
+
+export async function getProjectUsers(projectId: string) {
+  const { data } = await api.get<ApiResponse<User[]>>(`/projects/${projectId}/users`)
+  return data
 }

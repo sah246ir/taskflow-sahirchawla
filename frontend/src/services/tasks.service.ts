@@ -24,11 +24,12 @@ export type TaskListPayload = {
   tasks: TaskListData
   meta: PaginationMeta
 }
-type ListTasksQuery = {
-  status?: string
+export type ListTasksQuery = {
+  status?: TaskStatus
   assignee?: string
   page?: number
   limit?: number
+  priority?: TaskPriority
 }
 export async function listTasks(
   projectId: string,

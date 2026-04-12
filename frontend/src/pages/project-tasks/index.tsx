@@ -4,7 +4,14 @@ import { useParams } from 'react-router-dom'
 import type { PaginationState } from '@tanstack/react-table'
 import { Button } from '@/components/shadcn/button'
 import { CreateTaskDialog } from './components/CreateTaskDialog'
-import { deleteTask, listTasks, updateTask, type TaskListData } from '@/services/tasks.service'
+import { TaskFiltersToolbar } from './components/TaskFiltersToolbar'
+import {
+  deleteTask,
+  listTasks,
+  updateTask,
+  type ListTasksQuery,
+  type TaskListData,
+} from '@/services/tasks.service'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { DataTable } from '@/components/ui/table/DataTable'
 import { getTaskColumns } from './constants'
@@ -14,8 +21,6 @@ import { queryClient } from '@/config/queryClient'
 import { toast } from 'sonner'
 import type { TaskPriority, TaskStatus } from '@/schema/common.schema'
 import { ConfirmDialog } from '@/components/ui/dialogs/ConfirmDialog'
-import { getProject } from '@/services/projects.service'
-
 const ProjectTasksPage = () => {
   const { id: projectId } = useParams<{ id: string }>()
   const [createOpen, setCreateOpen] = useState(false)
@@ -24,24 +29,33 @@ const ProjectTasksPage = () => {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [taskFilters, setTaskFilters] = useState<
+    Pick<ListTasksQuery, 'status' | 'priority' | 'assignee'>
+  >({})
 
   useEffect(() => {
     setPagination({ pageIndex: 0, pageSize: 10 })
+    setTaskFilters({})
   }, [projectId])
 
   const { data, refetch, isLoading, isFetching } = useQuery({
-    queryKey: ['tasks', projectId, pagination.pageIndex, pagination.pageSize],
+    queryKey: [
+      'tasks',
+      projectId,
+      pagination.pageIndex,
+      pagination.pageSize,
+      taskFilters.status,
+      taskFilters.priority,
+      taskFilters.assignee,
+    ],
     queryFn: () =>
       listTasks(projectId!, {
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
+        ...(taskFilters.status ? { status: taskFilters.status } : {}),
+        ...(taskFilters.priority ? { priority: taskFilters.priority } : {}),
+        ...(taskFilters.assignee ? { assignee: taskFilters.assignee } : {}),
       }),
-    enabled: Boolean(projectId),
-  })
-  const { data: projectData, isLoading: isProjectLoading, isFetching: isProjectFetching } = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: () =>
-     getProject(projectId!),
     enabled: Boolean(projectId),
   })
 
@@ -60,7 +74,7 @@ const ProjectTasksPage = () => {
     mutationFn: ({body, taskId}: {body: updateTaskSchemaType, taskId: string}) => updateTask(taskId, body),
     onSuccess: () => {
       toast.success('Task updated successfully')
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', projectId], exact: false })
       refetch()
     },
   })
@@ -68,7 +82,7 @@ const ProjectTasksPage = () => {
     mutationFn: (taskId: string) => deleteTask(taskId),
     onSuccess: () => {
       toast.success('Task deleted successfully')
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', projectId], exact: false })
       refetch()
       setTaskAction(null)
     },
@@ -88,7 +102,19 @@ const ProjectTasksPage = () => {
   return (
     <PageLayout title="Project tasks" description="Tasks for this project.">
       <CardWrapper>
-        <div className="flex justify-end mb-4">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+          {projectId ? (
+            <TaskFiltersToolbar
+              projectId={projectId}
+              filters={taskFilters}
+              onFiltersChange={(next) => {
+                setTaskFilters(next)
+                setPagination((p) => ({ ...p, pageIndex: 0 }))
+              }}
+            />
+          ) : (
+            <div />
+          )}
           <Button
             type="button"
             disabled={!projectId}
@@ -124,7 +150,6 @@ const ProjectTasksPage = () => {
           projectId={projectId}
           initialValues={taskAction?.task}
           taskId={taskAction?.task?.id}
-          isOwner={projectData?.data.isOwner}
         />
 
         <ConfirmDialog
