@@ -1,4 +1,3 @@
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { ProtectedLayout } from './ProtectedLayout'
 import { Sidebar } from '@/components/ui/sidebar/Sidebar'

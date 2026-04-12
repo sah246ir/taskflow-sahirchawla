@@ -3,7 +3,7 @@ import { AuthenticationContext } from '@/context/AuthenticationContext'
 import { getMe } from '@/services/auth.service'
 import { useQuery } from '@tanstack/react-query'
 import React, { useEffect } from 'react'
-import { Outlet, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 export const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const { isLoading, isError,data }= useQuery({
     queryKey: ['me3'],
@@ -20,7 +20,7 @@ export const ProtectedLayout = ({ children }: { children: React.ReactNode }) => 
   }, [isError])
   if (isLoading) return <div>Loading...</div>
   return (
-    <AuthenticationContext.Provider value={{ isAuthenticated: !isError, user: isError ? null : data?.data, logout: () => {
+    <AuthenticationContext.Provider value={{ isAuthenticated: !isError, user: isError ? null : (data?.data ?? null), logout: () => {
       localStorage.removeItem('token')
       window.location.href = ROUTES.LOGIN
     } }}>
