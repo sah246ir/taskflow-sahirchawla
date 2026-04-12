@@ -1,4 +1,3 @@
-import type { ReactNode } from "react"
 import { MoreHorizontalIcon } from "lucide-react"
 import { Button } from "@/components/shadcn/button"
 import {
@@ -7,8 +6,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/shadcn/dropdown-menu"
-import { cn } from "@/lib/utils"
-
 export type TableActionItem = {
   title: string
   onClick: () => void

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Typeface } from '../../typeface'
 import { cn } from '@/lib/utils'
-import type { SidebarNavEntry } from '../constants'
+import type { ProjectSidebarEntry, SidebarNavEntry } from '../constants'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRightIcon, ChevronUpIcon, LayoutList, PencilIcon, Plus, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
@@ -47,7 +47,7 @@ export const ProjectsSidebarPopover = ({
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false)
   
-  const [projectAction, setProjectAction] = useState<{action: 'delete' | 'edit', project: SidebarNavEntry["projects"][number]} | null>(null)
+  const [projectAction, setProjectAction] = useState<{action: 'delete' | 'edit', project: ProjectSidebarEntry} | null>(null)
   const deleteMutation = useMutation({
     mutationFn: (projectId: string) => deleteProject(projectId),
     onSuccess: () => {
@@ -196,7 +196,7 @@ export const ProjectsSidebarPopover = ({
         setOpen={() => setProjectAction(null)}
         onCancel={() => setProjectAction(null)}
         onConfirm={() => {
-          deleteMutation.mutate(projectAction.project.id)
+          deleteMutation.mutate(projectAction?.project?.id as string)
         }}
         title="Delete Project"
         description="Are you sure you want to delete this project?"

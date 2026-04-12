@@ -66,7 +66,7 @@ export const CreateTaskDialog = ({
     },
   })
   const { mutate: updateTaskMutation, isPending: isUpdatePending } = useMutation({
-    mutationFn: (body: createTaskSchemaType) => updateTask(taskId, body),
+    mutationFn: (body: createTaskSchemaType) => updateTask(taskId as string, body),
     onSuccess: () => {
       toast.success('Task updated successfully')
       queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
@@ -82,7 +82,7 @@ export const CreateTaskDialog = ({
         status: data.status,
         priority: data.priority,
         due_date: data.due_date,
-        assignee_id: selectedUser.id,
+        assignee_id: selectedUser?.id,
       })
     } else {
       mutate({
@@ -91,7 +91,7 @@ export const CreateTaskDialog = ({
         status: data.status,
         priority: data.priority,
         due_date: data.due_date,
-        assignee_id: selectedUser.id,
+        assignee_id: selectedUser?.id,
       })
     }
   }

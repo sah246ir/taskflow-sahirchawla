@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
 import { ROUTES } from "@/config/routes";
-import { HomeIcon, FolderIcon, ListChecksIcon, LogOutIcon } from "lucide-react";
+import { HomeIcon, FolderIcon,  LogOutIcon } from "lucide-react";
 import type { ProjectListData } from "@/services/projects.service";
 
+export type ProjectSidebarEntry = {
+    title: string;
+    description: string;
+    href: string;
+    id: string;
+    owner_id: string;
+}
 export type SidebarNavEntry = {
     title: string;
     icon: ReactNode;
     href: string;
     onClick?: () => void;
-    projects?: {
-        title: string;
-        description: string;
-        href: string;
-        id: string;
-        owner_id: string;
-    }[];
+    projects?: ProjectSidebarEntry[];
 };
 
 export type SidebarItem = {
