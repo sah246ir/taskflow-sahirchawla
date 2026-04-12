@@ -1,15 +1,27 @@
 import {
-  createTaskRequestSchema,
-  updateTaskRequestSchema,
-  type CreateTaskRequest,
-  type ListTasksQuery,
-  type Task,
-  type TaskListData,
-  type UpdateTaskRequest,
+  createTaskSchema,
+  updateTaskSchema,
+  type createTaskSchemaType,
+  type updateTaskSchemaType,
 } from "../schema/tasks.schema"
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
 
+type TaskListData = {
+  id: string
+  title: string
+  description: string
+  status: string
+  priority: string
+  assignee_id: string
+  due_date: string
+}[]
+type ListTasksQuery = {
+  status?: string
+  assignee?: string
+  page?: number
+  limit?: number
+}
 export async function listTasks(
   projectId: string,
   query?: ListTasksQuery
@@ -22,19 +34,17 @@ export async function listTasks(
 
 export async function createTask(
   projectId: string,
-  body: CreateTaskRequest
+  body: createTaskSchemaType
 ){
-  createTaskRequestSchema.parse(body)
-  const { data } = await api.post<ApiResponse<Task>>(`/projects/${projectId}/tasks`, body)
+  const { data } = await api.post<ApiResponse<TaskListData[number]>>(`/projects/${projectId}/tasks`, body)
   return data
 }
 
 export async function updateTask(
   taskId: string,
-  body: UpdateTaskRequest
+  body: updateTaskSchemaType
 ){
-  updateTaskRequestSchema.parse(body)
-  const { data } = await api.patch<ApiResponse<Task>>(`/tasks/${taskId}`, body)
+  const { data } = await api.patch<ApiResponse<TaskListData[number]>>(`/tasks/${taskId}`, body)
   return data
 }
 

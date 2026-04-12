@@ -42,7 +42,7 @@ export const CreateProjectDialog = ({
   const { mutate, isPending } = useMutation({
     mutationFn: createProject,
     onSuccess: () => {
-      toast.success('Project created')
+      toast.success('Project created successfully')
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       setOpen(false)
     },
