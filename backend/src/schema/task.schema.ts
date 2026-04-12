@@ -1,16 +1,13 @@
 import z from "zod"
 import { TaskPriority, TaskStatus } from "../generated/prisma/client"
 
-export const taskProjectIdParamSchema = z.object({
-  projectId: z.string().uuid(),
-})
 
 export const listTasksQuerySchema = z.object({
-  status: z.enum(TaskStatus).array().optional(),
-  assignee: z.string().array().optional(),
+  status: z.enum(TaskStatus).optional(),
+  assignee: z.string().optional(),
   page: z.coerce.number().int().positive().optional(),
   limit: z.coerce.number().int().positive().max(100).optional(),
-  priority: z.enum(TaskPriority).array().optional(),
+  priority: z.enum(TaskPriority).optional(),
 })
 
 export const createTaskSchema = z.object({

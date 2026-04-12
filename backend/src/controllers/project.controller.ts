@@ -9,6 +9,7 @@ import {
   createProject,
   DeleteProject,
   getProjectById,
+  getProjectUsers,
   getProjects,
   UpdateProject,
 } from "../services/project.service"
@@ -46,9 +47,19 @@ export const createProjectController = async (req: Request, res: Response) => {
 
 export const getProjectByIdController = async (req: Request, res: Response) => {
   try {
-    const { id } = projectIdParamSchema.parse(req.params)
-    const project = await getProjectById(req.user!.userId, id)
+    const { projectId } = projectIdParamSchema.parse(req.params)
+    const project = await getProjectById(req.user!.userId, projectId)
     res.status(200).json(successResponse(project))
+  } catch (err) {
+    handleError(err, res)
+  }
+}
+
+export const getProjectUsersController = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = projectIdParamSchema.parse(req.params)
+    const users = await getProjectUsers(projectId)
+    res.status(200).json(successResponse(users))
   } catch (err) {
     handleError(err, res)
   }
@@ -56,11 +67,11 @@ export const getProjectByIdController = async (req: Request, res: Response) => {
 
 export const updateProjectController = async (req: Request, res: Response) => {
   try {
-    const { id } = projectIdParamSchema.parse(req.params)
+    const { projectId } = projectIdParamSchema.parse(req.params)
     const body = updateProjectSchema.parse(req.body)
     const project = await UpdateProject(
       req.user!.userId,
-      id,
+      projectId,
       body.name,
       body.description
     )
@@ -72,8 +83,8 @@ export const updateProjectController = async (req: Request, res: Response) => {
 
 export const deleteProjectController = async (req: Request, res: Response) => {
   try {
-    const { id } = projectIdParamSchema.parse(req.params)
-    await DeleteProject(req.user!.userId, id)
+    const { projectId } = projectIdParamSchema.parse(req.params)
+    await DeleteProject(req.user!.userId, projectId)
     res.status(204).send()
   } catch (err) {
     handleError(err, res)

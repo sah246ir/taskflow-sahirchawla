@@ -3,13 +3,13 @@ import { TaskPriority, TaskStatus } from "../generated/prisma/client"
 import {
   createTaskSchema,
   listTasksQuerySchema,
-  projectIdParamSchema,
   taskIdParamSchema,
   updateTaskSchema,
 } from "../schema/task.schema"
 import { createTask, deleteTask, listTasks, updateTask } from "../services/task.service"
 import { handleError } from "../utils/error"
 import { successResponse } from "../utils/response"
+import { projectIdParamSchema } from "../schema/project.schema"
 
 const toUtcDateOnly = (s: string) => new Date(`${s}T00:00:00.000Z`)
 
@@ -21,6 +21,7 @@ export const listProjectTasksController = async (req: Request, res: Response) =>
       filters: {
         status: query.status,
         assignee: query.assignee,
+        priority: query.priority,
       },
       pagination: {
         page: query.page,

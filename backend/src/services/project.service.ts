@@ -187,3 +187,18 @@ export const DeleteProject = async(
 
     return true
 }
+
+export const getProjectUsers = async(
+    projectId:string,
+)=>{
+    const users = await prisma.user.findMany({
+        where:{
+            assigned_tasks:{
+                some:{
+                    project_id:projectId
+                }
+            }
+        }
+    })
+    return users
+}

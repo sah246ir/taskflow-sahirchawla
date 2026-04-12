@@ -1,7 +1,7 @@
 import z from "zod"
 
 export const projectIdParamSchema = z.object({
-  id: z.string().uuid(),
+  projectId: z.string().uuid(),
 })
 
 export const listProjectsQuerySchema = z.object({

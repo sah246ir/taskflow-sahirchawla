@@ -19,16 +19,16 @@ export const listTasks = async (
   userId: string,
   projectId: string,
   options: {
-    filters: { status?: TaskStatus[]; assignee?: string[], priority?: TaskPriority[] }
+    filters: { status?: TaskStatus; assignee?: string; priority?: TaskPriority }
     pagination: PaginationQuery
   }
 ) => {
   const { limit, page, skip, take } = getPaginationParams(options.pagination)
   const where = {
     project_id: projectId,
-    ...(options.filters.status ? { status: { in: options.filters.status } } : {}),
-    ...(options.filters.assignee ? { assignee_id: { in: options.filters.assignee } } : {}),
-    ...(options.filters.priority ? { priority: { in: options.filters.priority } } : {}),
+    ...(options.filters.status ? { status: options.filters.status } : {}),
+    ...(options.filters.assignee ? { assignee_id: options.filters.assignee } : {}),
+    ...(options.filters.priority ? { priority: options.filters.priority } : {}),
   }
   const tasks = await prisma.task.findMany({
     where,

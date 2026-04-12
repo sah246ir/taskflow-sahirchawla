@@ -3,6 +3,7 @@ import {
   createProjectController,
   deleteProjectController,
   getProjectByIdController,
+  getProjectUsersController,
   listProjectsController,
   updateProjectController,
 } from "../../controllers/project.controller"
@@ -16,9 +17,14 @@ projectRouter.use(authMiddleware)
 
 projectRouter.get("/", listProjectsController)
 projectRouter.post("/", createProjectController)
-projectRouter.get("/:id", getProjectByIdController)
-projectRouter.patch("/:id", updateProjectController)
-projectRouter.delete("/:id", deleteProjectController)
+projectRouter.get("/:projectId", getProjectByIdController)
+projectRouter.get(
+  "/:projectId/users",
+  projectAccessMiddleware,
+  getProjectUsersController
+)
+projectRouter.patch("/:projectId", updateProjectController)
+projectRouter.delete("/:projectId", deleteProjectController)
 
 projectRouter.get(
   "/:projectId/tasks",
