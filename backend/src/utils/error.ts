@@ -51,21 +51,21 @@ export const handleError = (error: unknown, res: Response) => {
     const status = statusFromCode[error.code]
     if (error.code === "VALIDATION_ERROR" && error.meta?.fields) {
       return res.status(status).json(
-        errorResponse("validation failed", {
+        errorResponse(error.message || "validation failed", {
           fields: error.meta.fields as Record<string, string>,
         })
       )
     }
     if (error.code === "NOT_FOUND") {
-      return res.status(status).json(errorResponse("not found"))
+      return res.status(status).json(errorResponse(error.message || "not found"))
     }
     if (error.code === "UNAUTHORIZED") {
-      return res.status(status).json(errorResponse("unauthorized"))
+      return res.status(status).json(errorResponse(error.message || "unauthorized"))
     }
     if (error.code === "FORBIDDEN") {
-      return res.status(status).json(errorResponse("forbidden"))
+      return res.status(status).json(errorResponse(error.message || "forbidden"))
     }
-    return res.status(status).json(errorResponse(error.message))
+    return res.status(status).json(errorResponse(error.message || "internal server error"))
   }
   console.error(error)
   return res.status(500).json(errorResponse("internal server error"))

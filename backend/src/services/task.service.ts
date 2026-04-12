@@ -99,7 +99,7 @@ export const updateTask = async (
   const isAssignee = task.assignee_id === userId
   const isCreator = task.creator_id === userId
   if (!isOwner && !isAssignee && !isCreator) {
-    throw new AppError("FORBIDDEN", "Cannot update this task")
+    throw new AppError("FORBIDDEN", "You are not authorized to update this task")
   }
 
   return prisma.task.update({
