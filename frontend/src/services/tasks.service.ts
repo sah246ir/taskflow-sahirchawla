@@ -7,6 +7,7 @@ import type { TaskPriority, TaskStatus } from "../schema/common.schema"
 import type { ApiResponse } from "../types/apiResponse"
 import { api } from "./api"
 import type { User } from "./auth.service"
+import { cleanObject } from "@/utils/object"
 
 export type TaskListData = {
   id: string
@@ -36,7 +37,7 @@ export async function listTasks(
   query?: ListTasksQuery
 ) {
   const { data } = await api.get<ApiResponse<TaskListPayload>>(`/projects/${projectId}/tasks`, {
-    params: query,
+    params: cleanObject(query),
   })
   return data
 }

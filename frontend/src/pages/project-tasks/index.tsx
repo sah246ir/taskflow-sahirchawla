@@ -52,9 +52,9 @@ const ProjectTasksPage = () => {
       listTasks(projectId!, {
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
-        ...(taskFilters.status ? { status: taskFilters.status } : {}),
-        ...(taskFilters.priority ? { priority: taskFilters.priority } : {}),
-        ...(taskFilters.assignee ? { assignee: taskFilters.assignee } : {}),
+        status: taskFilters.status,
+        priority: taskFilters.priority,
+        assignee: taskFilters.assignee
       }),
     enabled: Boolean(projectId),
   })
